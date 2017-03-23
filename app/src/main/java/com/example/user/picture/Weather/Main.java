@@ -10,57 +10,57 @@ public class Main implements Serializable {
 
     @SerializedName("temp")
     @Expose
-    private Float temp;
+    private double temp;
     @SerializedName("pressure")
     @Expose
-    private Integer pressure;
+    private String pressure;
     @SerializedName("humidity")
     @Expose
-    private Integer humidity;
+    private String humidity;
     @SerializedName("temp_min")
     @Expose
-    private Float tempMin;
+    private Double tempMin;
     @SerializedName("temp_max")
     @Expose
-    private Float tempMax;
+    private Double tempMax;
 
-    public Float getTemp() {
+    public double getTemp() {
         return temp;
     }
 
-    public void setTemp(Float temp) {
+    public void setTemp(double temp) {
         this.temp = temp;
     }
 
-    public Integer getPressure() {
+    public String getPressure() {
         return pressure;
     }
 
-    public void setPressure(Integer pressure) {
+    public void setPressure(String pressure) {
         this.pressure = pressure;
     }
 
-    public Integer getHumidity() {
+    public String getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(Integer humidity) {
+    public void setHumidity(String humidity) {
         this.humidity = humidity;
     }
 
-    public Float getTempMin() {
+    public Double getTempMin() {
         return tempMin;
     }
 
-    public void setTempMin(Float tempMin) {
+    public void setTempMin(Double tempMin) {
         this.tempMin = tempMin;
     }
 
-    public Float getTempMax() {
+    public Double getTempMax() {
         return tempMax;
     }
 
-    public void setTempMax(Float tempMax) {
+    public void setTempMax(Double tempMax) {
         this.tempMax = tempMax;
     }
 

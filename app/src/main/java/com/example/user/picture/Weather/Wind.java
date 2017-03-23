@@ -13,7 +13,7 @@ public class Wind implements Serializable {
     private String speed;
     @SerializedName("deg")
     @Expose
-    private Integer deg;
+    private double deg;
 
     public String getSpeed() {
         return speed;
@@ -23,7 +23,7 @@ public class Wind implements Serializable {
         this.speed = speed;
     }
 
-    public Integer getDeg() {
+    public double getDeg() {
         return deg;
     }
 

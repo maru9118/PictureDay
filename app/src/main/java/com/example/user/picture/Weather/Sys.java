@@ -16,7 +16,7 @@ public class Sys implements Serializable {
     private Integer id;
     @SerializedName("message")
     @Expose
-    private Float message;
+    private Double message;
     @SerializedName("country")
     @Expose
     private String country;
@@ -43,11 +43,11 @@ public class Sys implements Serializable {
         this.id = id;
     }
 
-    public Float getMessage() {
+    public Double getMessage() {
         return message;
     }
 
-    public void setMessage(Float message) {
+    public void setMessage(Double message) {
         this.message = message;
     }
 

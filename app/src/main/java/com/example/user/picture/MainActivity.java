@@ -1,5 +1,6 @@
 package com.example.user.picture;
 
+import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
 import android.os.Bundle;
@@ -99,17 +100,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                 marker.showInfoWindow();
                 marker.hideInfoWindow();
-//
-//                GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
-//                    @Override
-//                    public void onInfoWindowClick(Marker marker) {
-//                        Intent intent = new Intent(MainActivity.this, NowActivity.class);
-////                        intent.putExtra("data", result);
-//
-//                        startActivity(intent);
-//                    }
-//                };
-//                mMap.setOnInfoWindowClickListener(infoWindowClickListener);
+
+                GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                    @Override
+                    public void onInfoWindowClick(Marker marker) {
+                        Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                        intent.putExtra("data", result);
+
+                        startActivity(intent);
+                    }
+                };
+                mMap.setOnInfoWindowClickListener(infoWindowClickListener);
 
             }
 

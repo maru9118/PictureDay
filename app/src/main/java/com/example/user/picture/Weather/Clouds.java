@@ -10,13 +10,13 @@ public class Clouds implements Serializable {
 
     @SerializedName("all")
     @Expose
-    private Integer all;
+    private String all;
 
-    public Integer getAll() {
+    public String getAll() {
         return all;
     }
 
-    public void setAll(Integer all) {
+    public void setAll(String all) {
         this.all = all;
     }
 

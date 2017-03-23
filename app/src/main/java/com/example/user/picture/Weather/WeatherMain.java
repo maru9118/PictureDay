@@ -23,7 +23,7 @@ public class WeatherMain implements Serializable {
     private Main main;
     @SerializedName("visibility")
     @Expose
-    private Integer visibility;
+    private String visibility;
     @SerializedName("wind")
     @Expose
     private Wind wind;
@@ -78,11 +78,11 @@ public class WeatherMain implements Serializable {
         this.main = main;
     }
 
-    public Integer getVisibility() {
+    public String getVisibility() {
         return visibility;
     }
 
-    public void setVisibility(Integer visibility) {
+    public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
 
