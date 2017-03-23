@@ -102,16 +102,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 marker.showInfoWindow();
                 marker.hideInfoWindow();
 
-                Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lng);
+                final Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lng);
                 data.enqueue(new Callback<Forecast>() {
                     @Override
                     public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                        final Forecast forecastResult = response.body();
 
                         GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
                             @Override
                             public void onInfoWindowClick(Marker marker) {
                                 Intent intent = new Intent(MainActivity.this, NowActivity.class);
                                 intent.putExtra("data", result);
+                                intent.putExtra("forecast", forecastResult);
 
                                 startActivity(intent);
                             }

@@ -21,7 +21,7 @@ public class Forecast implements Serializable {
     @SerializedName("cnt")
     @Expose
     private Integer cnt;
-    @SerializedName("title")
+    @SerializedName("list")
     @Expose
     private List<Title> title = null;
 

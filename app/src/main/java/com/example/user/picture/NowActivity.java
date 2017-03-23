@@ -10,6 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.user.picture.Weather.WeatherMain;
+import com.example.user.picture.forecast.Forecast;
+import com.example.user.picture.forecast.Title;
+
+import java.util.ArrayList;
 
 public class NowActivity extends AppCompatActivity {
 
@@ -17,6 +21,7 @@ public class NowActivity extends AppCompatActivity {
     private ViewPager mPager;
     private MyAdater mAdater;
     private NowFragment mNowFragment;
+    private ForecastFragment mForecastFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,7 @@ public class NowActivity extends AppCompatActivity {
         mPager = (ViewPager) findViewById(R.id.map_pager);
 
         WeatherMain data = (WeatherMain) getIntent().getSerializableExtra("data");
+        Forecast forecast = (Forecast) getIntent().getSerializableExtra("forecast");
 
         mAdater = new MyAdater(getSupportFragmentManager());
 
@@ -34,6 +40,7 @@ public class NowActivity extends AppCompatActivity {
         mTab.setupWithViewPager(mPager);
 
         mNowFragment = new NowFragment().newInstance(data);
+        mForecastFragment = new ForecastFragment().newInstance((ArrayList<Title>) forecast.getTitle());
     }
 
     public void onClick(View view) {
@@ -52,7 +59,7 @@ public class NowActivity extends AppCompatActivity {
                 case 0:
                     return mNowFragment;
                 case 1:
-                    return new ForecastFragment();
+                    return mForecastFragment;
             }
 
             return null;
