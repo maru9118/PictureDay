@@ -16,6 +16,7 @@ public class NowActivity extends AppCompatActivity {
     private TabLayout mTab;
     private ViewPager mPager;
     private MyAdater mAdater;
+    private NowFragment mNowFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,8 @@ public class NowActivity extends AppCompatActivity {
 
         mPager.setAdapter(mAdater);
         mTab.setupWithViewPager(mPager);
+
+        mNowFragment = new NowFragment().newInstance(data);
     }
 
     public void onClick(View view) {
@@ -46,7 +49,10 @@ public class NowActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-
+                case 0:
+                    return mNowFragment;
+                case 1:
+                    return new ForecastFragment();
             }
 
             return null;
