@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.user.picture.Weather.WeatherMain;
+import com.example.user.picture.forecast.Forecast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         final double lat = latLng.latitude;
         final double lng = latLng.longitude;
 
-        Call<WeatherMain> data = mApi.getData(WeatherApi.API_KEY, lat, lng);
+        Call<WeatherMain> data = mApi.getWeather(WeatherApi.API_KEY, lat, lng);
         data.enqueue(new Callback<WeatherMain>() {
             @Override
             public void onResponse(Call<WeatherMain> call, Response<WeatherMain> response) {
@@ -101,17 +102,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 marker.showInfoWindow();
                 marker.hideInfoWindow();
 
-                GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lng);
+                data.enqueue(new Callback<Forecast>() {
                     @Override
-                    public void onInfoWindowClick(Marker marker) {
-                        Intent intent = new Intent(MainActivity.this, NowActivity.class);
-                        intent.putExtra("data", result);
+                    public void onResponse(Call<Forecast> call, Response<Forecast> response) {
 
-                        startActivity(intent);
+                        GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                            @Override
+                            public void onInfoWindowClick(Marker marker) {
+                                Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                                intent.putExtra("data", result);
+
+                                startActivity(intent);
+                            }
+                        };
+                        mMap.setOnInfoWindowClickListener(infoWindowClickListener);
                     }
-                };
-                mMap.setOnInfoWindowClickListener(infoWindowClickListener);
 
+                    @Override
+                    public void onFailure(Call<Forecast> call, Throwable t) {
+
+                    }
+                });
             }
 
             @Override

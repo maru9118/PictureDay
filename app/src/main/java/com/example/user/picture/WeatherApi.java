@@ -1,6 +1,7 @@
 package com.example.user.picture;
 
 import com.example.user.picture.Weather.WeatherMain;
+import com.example.user.picture.forecast.Forecast;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -16,8 +17,13 @@ public interface WeatherApi {
     String API_KEY = "0a66e9e9f3c2674e0f1bf8a15a627693";
 
     @GET("weather")
-    Call<WeatherMain> getData(@Query("APPID") String appid,
-                              @Query("lat") double lat,
-                              @Query("lon") double lon);
+    Call<WeatherMain> getWeather(@Query("APPID") String appid,
+                                 @Query("lat") double lat,
+                                 @Query("lon") double lon);
+
+    @GET("forecast")
+    Call<Forecast> getForecast(@Query("APPID") String appid,
+                               @Query("lat") double lat,
+                               @Query("lon") double lon);
 
 }
