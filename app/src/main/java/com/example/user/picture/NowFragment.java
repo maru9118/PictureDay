@@ -1,5 +1,6 @@
 package com.example.user.picture;
 
+import android.graphics.Matrix;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
@@ -15,6 +16,10 @@ import android.widget.TextView;
 import com.example.user.picture.Weather.WeatherMain;
 
 import java.util.Locale;
+
+import static android.R.attr.angle;
+import static android.R.attr.pivotX;
+import static android.R.attr.pivotY;
 
 /**
  * Created by user on 2017-03-23.
@@ -85,6 +90,11 @@ public class NowFragment extends Fragment {
 
         mSpeedText.setText(data.getWind().getSpeed());
 
+        Matrix matrix = new Matrix();
+        mWayImage.setScaleType(ImageView.ScaleType.MATRIX);   //required
+        matrix.postRotate((float) angle, pivotX, pivotY);
+        mWayImage.setImageMatrix(matrix);
+
         mWeater.setText(data.getClouds().getAll());
 
         Double tempChange = data.getMain().getTemp() - 273.15;
@@ -102,4 +112,5 @@ public class NowFragment extends Fragment {
 
         return view;
     }
+
 }
