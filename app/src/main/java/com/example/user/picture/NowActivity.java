@@ -61,7 +61,6 @@ public class NowActivity extends AppCompatActivity {
                 case 1:
                     return mForecastFragment;
             }
-
             return null;
         }
 

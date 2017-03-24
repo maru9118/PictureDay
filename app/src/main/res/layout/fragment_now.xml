@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="#ADD8E6"
     android:orientation="vertical">
 
     <LinearLayout
@@ -37,13 +37,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/sunrise" />
 
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/sunset" />
 
         </LinearLayout>
 
@@ -112,8 +112,7 @@
                 android:id="@+id/way_image"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@mipmap/ic_launcher" />
+                android:layout_weight="1" />
 
         </LinearLayout>
 
