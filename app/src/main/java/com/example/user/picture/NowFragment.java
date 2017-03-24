@@ -1,5 +1,7 @@
 package com.example.user.picture;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
@@ -16,10 +18,6 @@ import android.widget.TextView;
 import com.example.user.picture.Weather.WeatherMain;
 
 import java.util.Locale;
-
-import static android.R.attr.angle;
-import static android.R.attr.pivotX;
-import static android.R.attr.pivotY;
 
 /**
  * Created by user on 2017-03-23.
@@ -90,10 +88,10 @@ public class NowFragment extends Fragment {
 
         mSpeedText.setText(data.getWind().getSpeed());
 
-        Matrix matrix = new Matrix();
-        mWayImage.setScaleType(ImageView.ScaleType.MATRIX);   //required
-        matrix.postRotate((float) angle, pivotX, pivotY);
-        mWayImage.setImageMatrix(matrix);
+
+        mWayImage = (ImageView) view.findViewById(R.id.way_image);
+        mWayImage.setImageBitmap(rotateImage(
+                BitmapFactory.decodeResource(getResources(), R.drawable.arrow), data.getWind().getDeg() ));
 
         mWeater.setText(data.getClouds().getAll());
 
@@ -113,4 +111,15 @@ public class NowFragment extends Fragment {
         return view;
     }
 
+    // 이미지 회전 함수
+    public Bitmap rotateImage(Bitmap src, float degree) {
+
+        // Matrix 객체 생성
+        Matrix matrix = new Matrix();
+        // 회전 각도 셋팅
+        matrix.postRotate(degree);
+        // 이미지와 Matrix 를 셋팅해서 Bitmap 객체 생성
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(),
+                src.getHeight(), matrix, true);
+    }
 }
