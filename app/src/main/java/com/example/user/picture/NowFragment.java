@@ -75,6 +75,20 @@ public class NowFragment extends Fragment {
         mHumText = (TextView) view.findViewById(R.id.hum_text);
         mVisText = (TextView) view.findViewById(R.id.vis_text);
 
+        switch (data.getWeather().get(0).getMain()) {
+            case "Haze":
+                mMainImage.setImageResource(R.drawable.sun);
+                break;
+            case "Clouds":
+                mMainImage.setImageResource(R.drawable.clouds);
+                break;
+            case "Snow":
+                mMainImage.setImageResource(R.drawable.snow);
+                break;
+            default:
+                mMainImage.setImageResource(R.drawable.test2);
+        }
+
         // 일출
         SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
         sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -99,8 +113,6 @@ public class NowFragment extends Fragment {
 
         DecimalFormat form = new DecimalFormat("#.##");
         double dNumber = tempChange;
-
-//        String temp = Double.toString();
 
         mTempText.setText(form.format(dNumber));
 

@@ -3,10 +3,10 @@ package com.example.user.picture;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.user.picture.Weather.WeatherMain;
@@ -15,7 +15,7 @@ import com.example.user.picture.forecast.Title;
 
 import java.util.ArrayList;
 
-public class NowActivity extends AppCompatActivity {
+public class NowActivity extends FragmentActivity {
 
     private TabLayout mTab;
     private ViewPager mPager;
