@@ -1,5 +1,6 @@
 package com.example.user.picture;
 
+import android.content.Context;
 import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.example.user.picture.Weather.WeatherMain;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private WeatherApi mApi;
     private Geocoder mGeocoder;
     private List<Address> mList;
+    private Marker mMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         MenuItem searchItem = menu.findItem(R.id.menu_serch);
 
-        SearchView searchView = (SearchView)
+        final SearchView searchView = (SearchView)
                 MenuItemCompat.getActionView(searchItem);
 
         searchView.setQueryHint("도시를 입력하세요.");
@@ -76,6 +79,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //TODO : 검색 버튼 클릭 시 구현.
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                citySearch(query);
+
+                final double lat = mList.get(0).getLatitude();
+                final double lon = mList.get(0).getLongitude();
+
+                LatLng latLng = new LatLng(lat, lon);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
+                weatherData(lat, lon);
+
+                // 키보드 숨기기
+                InputMethodManager hide = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                hide.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+
                 return true;
             }
 
@@ -93,8 +111,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delet:
-                Toast.makeText(this, "설정 미구현2", Toast.LENGTH_SHORT).show();
-                return true;
+                mMarker.remove();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -111,64 +128,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapLongClick(final LatLng latLng) {
-        final double lat = latLng.latitude;
-        final double lng = latLng.longitude;
+        double lat = latLng.latitude;
+        double lng = latLng.longitude;
 
-        Call<WeatherMain> data = mApi.getWeather(WeatherApi.API_KEY, lat, lng);
-        data.enqueue(new Callback<WeatherMain>() {
-            @Override
-            public void onResponse(Call<WeatherMain> call, Response<WeatherMain> response) {
-                final WeatherMain result = response.body();
-
-                // 일출
-                SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
-                sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                // 일몰
-                SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
-                sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng)
-                        .title("" + sunRise.format(result.getSys().getSunrise() * 1000L)
-                                + "→" + sunSet.format(result.getSys().getSunset() * 1000L)));
-
-                marker.showInfoWindow();
-                marker.hideInfoWindow();
-
-                final Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lng);
-                data.enqueue(new Callback<Forecast>() {
-                    @Override
-                    public void onResponse(Call<Forecast> call, Response<Forecast> response) {
-                        final Forecast forecastResult = response.body();
-
-                        GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
-                            @Override
-                            public void onInfoWindowClick(Marker marker) {
-                                Intent intent = new Intent(MainActivity.this, NowActivity.class);
-                                intent.putExtra("data", result);
-                                intent.putExtra("forecast", forecastResult);
-
-                                startActivity(intent);
-                            }
-                        };
-                        mMap.setOnInfoWindowClickListener(infoWindowClickListener);
-                    }
-
-                    @Override
-                    public void onFailure(Call<Forecast> call, Throwable t) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(Call<WeatherMain> call, Throwable t) {
-                Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        weatherData(lat, lng);
     }
 
-    public void reMapReady(String city) {
+    public void citySearch(String city) {
 
         try {
             mList = mGeocoder.getFromLocationName(
@@ -184,5 +150,63 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(this, "해당되는 주소정보는 없습니다.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void weatherData(final double lat, final double lon) {
+
+        final LatLng latLng = new LatLng(lat, lon);
+
+        Call<WeatherMain> data = mApi.getWeather(WeatherApi.API_KEY, lat, lon);
+        data.enqueue(new Callback<WeatherMain>() {
+            @Override
+            public void onResponse(Call<WeatherMain> call, Response<WeatherMain> response) {
+                final WeatherMain weatherData = response.body();
+
+                // 일출
+                SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
+                sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                // 일몰
+                SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
+                sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                        .title("" + sunRise.format(weatherData.getSys().getSunrise() * 1000L)
+                                + "→" + sunSet.format(weatherData.getSys().getSunset() * 1000L)));
+
+                mMarker.showInfoWindow();
+                mMarker.hideInfoWindow();
+
+                Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lon);
+                data.enqueue(new Callback<Forecast>() {
+                    @Override
+                    public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                        final Forecast forecastData = response.body();
+
+                        GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                            @Override
+                            public void onInfoWindowClick(Marker marker) {
+                                Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                                intent.putExtra("data", weatherData);
+                                intent.putExtra("forecast", forecastData);
+
+                                startActivity(intent);
+                            }
+                        };
+                        mMap.setOnInfoWindowClickListener(infoWindowClickListener);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Forecast> call, Throwable t) {
+                        Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<WeatherMain> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "실패2", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
