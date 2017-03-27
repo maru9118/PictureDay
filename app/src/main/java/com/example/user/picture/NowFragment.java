@@ -91,7 +91,7 @@ public class NowFragment extends Fragment {
 
         mWayImage = (ImageView) view.findViewById(R.id.way_image);
         mWayImage.setImageBitmap(rotateImage(
-                BitmapFactory.decodeResource(getResources(), R.drawable.arrow), data.getWind().getDeg() ));
+                BitmapFactory.decodeResource(getResources(), R.drawable.wind), data.getWind().getDeg()));
 
         mWeater.setText(data.getClouds().getAll());
 

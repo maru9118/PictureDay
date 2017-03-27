@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.user.picture.Weather.WeatherMain;
 import com.example.user.picture.forecast.Forecast;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -65,8 +66,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         inflater.inflate(R.menu.menu_weather, menu);
 
         MenuItem searchItem = menu.findItem(R.id.menu_serch);
+
         SearchView searchView = (SearchView)
                 MenuItemCompat.getActionView(searchItem);
+
+        searchView.setQueryHint("도시를 입력하세요.");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             //TODO : 검색 버튼 클릭 시 구현.
@@ -99,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapLongClickListener(this);
+
+        LatLng startingPoint = new LatLng(37.56, 126.97);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 10));
     }
 
 

@@ -110,7 +110,7 @@ public class ExpAdater extends BaseExpandableListAdapter {
         viewHolder.speedText.setText(GroupData.get(groupPosition).getWind().getSpeed());
 
         viewHolder.wayImage.setImageBitmap(rotateImage(
-                BitmapFactory.decodeResource(parent.getContext().getResources(), R.drawable.arrow),
+                BitmapFactory.decodeResource(parent.getContext().getResources(), R.drawable.wind),
                 GroupData.get(groupPosition).getWind().getDeg()));
 
         viewHolder.atmoText.setText(GroupData.get(groupPosition).getMain().getPressure());
