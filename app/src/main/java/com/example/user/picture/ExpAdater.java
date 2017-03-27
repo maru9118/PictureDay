@@ -87,6 +87,8 @@ public class ExpAdater extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_child, parent, false);
 
+            viewHolder.mainImage = (ImageView) convertView.findViewById(R.id.main_image);
+
             viewHolder.weatherText = (TextView) convertView.findViewById(R.id.weater_item);
             viewHolder.tempText = (TextView) convertView.findViewById(R.id.temp_item);
 
@@ -102,6 +104,26 @@ public class ExpAdater extends BaseExpandableListAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
+        switch (GroupData.get(groupPosition).getWeather().get(childPosition).getMain()) {
+            case "Clear":
+                viewHolder.mainImage.setImageResource(R.drawable.sun);
+                break;
+            case "Clouds":
+                viewHolder.mainImage.setImageResource(R.drawable.clouds);
+                break;
+            case "Snow":
+                viewHolder.mainImage.setImageResource(R.drawable.snow);
+                break;
+            case "Rain":
+                viewHolder.mainImage.setImageResource(R.drawable.rain);
+                break;
+            case "Haze":
+            case "Mist":
+                viewHolder.mainImage.setImageResource(R.drawable.mist);
+                break;
+        }
+
 
         viewHolder.weatherText.setText(GroupData.get(groupPosition).getWeather().get(childPosition).getMain());
 
@@ -129,6 +151,7 @@ public class ExpAdater extends BaseExpandableListAdapter {
     private class ViewHolder {
         private TextView groupText;
 
+        private ImageView mainImage;
         private TextView weatherText;
         private TextView tempText;
         private TextView speedText;

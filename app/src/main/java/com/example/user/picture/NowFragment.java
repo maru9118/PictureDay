@@ -76,7 +76,7 @@ public class NowFragment extends Fragment {
         mVisText = (TextView) view.findViewById(R.id.vis_text);
 
         switch (data.getWeather().get(0).getMain()) {
-            case "Haze":
+            case "Clear":
                 mMainImage.setImageResource(R.drawable.sun);
                 break;
             case "Clouds":
@@ -85,8 +85,13 @@ public class NowFragment extends Fragment {
             case "Snow":
                 mMainImage.setImageResource(R.drawable.snow);
                 break;
-            default:
-                mMainImage.setImageResource(R.drawable.test2);
+            case "Rain":
+                mMainImage.setImageResource(R.drawable.rain);
+                break;
+            case "Haze":
+            case "Mist":
+                mMainImage.setImageResource(R.drawable.mist);
+                break;
         }
 
         // 일출

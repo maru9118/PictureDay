@@ -44,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Geocoder mGeocoder;
     private List<Address> mList;
     private Marker mMarker;
+    private double mLat;
+    private double mLng;
+    private WeatherMain mWeatherData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mApi = mRetrofit.create(WeatherApi.class);
         mGeocoder = new Geocoder(this);
+
     }
 
     @Override
@@ -76,7 +80,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         searchView.setQueryHint("도시를 입력하세요.");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
-            //TODO : 검색 버튼 클릭 시 구현.
             @Override
             public boolean onQueryTextSubmit(String query) {
 
@@ -128,10 +131,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapLongClick(final LatLng latLng) {
-        double lat = latLng.latitude;
-        double lng = latLng.longitude;
+        mLat = latLng.latitude;
+        mLng = latLng.longitude;
 
-        weatherData(lat, lng);
+        weatherData(mLat, mLng);
     }
 
     public void citySearch(String city) {
@@ -160,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         data.enqueue(new Callback<WeatherMain>() {
             @Override
             public void onResponse(Call<WeatherMain> call, Response<WeatherMain> response) {
-                final WeatherMain weatherData = response.body();
+                mWeatherData = response.body();
 
                 // 일출
                 SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
@@ -170,37 +173,73 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
                 sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
-                        .title("" + sunRise.format(weatherData.getSys().getSunrise() * 1000L)
-                                + "→" + sunSet.format(weatherData.getSys().getSunset() * 1000L)));
 
-                mMarker.showInfoWindow();
-                mMarker.hideInfoWindow();
+                if (mMarker != null) {
+                    mMarker.remove();
+                    mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
+                                    + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
 
-                Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lon);
-                data.enqueue(new Callback<Forecast>() {
-                    @Override
-                    public void onResponse(Call<Forecast> call, Response<Forecast> response) {
-                        final Forecast forecastData = response.body();
+                    mMarker.showInfoWindow();
+                    mMarker.hideInfoWindow();
 
-                        GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
-                            @Override
-                            public void onInfoWindowClick(Marker marker) {
-                                Intent intent = new Intent(MainActivity.this, NowActivity.class);
-                                intent.putExtra("data", weatherData);
-                                intent.putExtra("forecast", forecastData);
+                    Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lon);
+                    data.enqueue(new Callback<Forecast>() {
+                        @Override
+                        public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                            final Forecast forecastData = response.body();
 
-                                startActivity(intent);
-                            }
-                        };
-                        mMap.setOnInfoWindowClickListener(infoWindowClickListener);
-                    }
+                            GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                                @Override
+                                public void onInfoWindowClick(Marker marker) {
+                                    Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                                    intent.putExtra("data", mWeatherData);
+                                    intent.putExtra("forecast", forecastData);
 
-                    @Override
-                    public void onFailure(Call<Forecast> call, Throwable t) {
-                        Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                                    startActivity(intent);
+                                }
+                            };
+                            mMap.setOnInfoWindowClickListener(infoWindowClickListener);
+                        }
+
+                        @Override
+                        public void onFailure(Call<Forecast> call, Throwable t) {
+                            Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
+                                    + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
+
+                    mMarker.showInfoWindow();
+                    mMarker.hideInfoWindow();
+
+                    Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lon);
+                    data.enqueue(new Callback<Forecast>() {
+                        @Override
+                        public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                            final Forecast forecastData = response.body();
+
+                            GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                                @Override
+                                public void onInfoWindowClick(Marker marker) {
+                                    Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                                    intent.putExtra("data", mWeatherData);
+                                    intent.putExtra("forecast", forecastData);
+
+                                    startActivity(intent);
+                                }
+                            };
+                            mMap.setOnInfoWindowClickListener(infoWindowClickListener);
+                        }
+
+                        @Override
+                        public void onFailure(Call<Forecast> call, Throwable t) {
+                            Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -208,5 +247,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.makeText(MainActivity.this, "실패2", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // 상태 저장
+        outState.putDouble("Lat", mLat);
+        outState.putDouble("Lng", mLng);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        mLat = savedInstanceState.getDouble("Lat");
+        mLng = savedInstanceState.getDouble("Lng");
+
+        LatLng latLng = new LatLng(mLat, mLng);
+
+        // 일출
+        SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
+        sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        // 일몰
+        SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
+        sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng)
+                .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
+                        + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
+
+        marker.showInfoWindow();
+        marker.hideInfoWindow();
+
     }
 }
