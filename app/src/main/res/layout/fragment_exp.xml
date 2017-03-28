@@ -5,6 +5,8 @@
     android:orientation="vertical">
 
     <TextView
+        android:textStyle="bold"
+        android:textColor="#000"
         android:id="@+id/item_group"
         android:layout_width="match_parent"
         android:layout_height="60dp"

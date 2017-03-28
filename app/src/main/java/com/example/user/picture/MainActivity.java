@@ -86,20 +86,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 citySearch(query);
 
-                final double lat = mList.get(0).getLatitude();
-                final double lon = mList.get(0).getLongitude();
+                if (mList.size() == 0) {
+                    Toast.makeText(MainActivity.this, "재입력 하세요.", Toast.LENGTH_SHORT).show();
+                } else {
 
-                LatLng latLng = new LatLng(lat, lon);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    final double lat = mList.get(0).getLatitude();
+                    final double lon = mList.get(0).getLongitude();
 
-                weatherData(lat, lon);
+                    LatLng latLng = new LatLng(lat, lon);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
 
-                // 키보드 숨기기
-                InputMethodManager hide = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                hide.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                    weatherData(lat, lon);
 
+                    // 키보드 숨기기
+                    InputMethodManager hide = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    hide.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                }
                 return true;
             }
+
 
             @Override
             public boolean onQueryTextChange(String newText) {
@@ -125,8 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.setOnMapLongClickListener(this);
         if (mWeatherData == null) {
-            mMap.setOnMapLongClickListener(this);
 
             LatLng startingPoint = new LatLng(37.56, 126.97);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 10));
@@ -199,12 +204,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     10); // 읽을 개수
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
+            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
         }
 
         if (mList != null) {
             if (mList.size() == 0) {
-                Toast.makeText(this, "해당되는 주소정보는 없습니다.", Toast.LENGTH_SHORT).show();
             }
         }
     }
