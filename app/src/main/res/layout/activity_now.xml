@@ -8,7 +8,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.example.user.picture.NowActivity">
+    tools:context="com.whyweather.user.picture.NowActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/map_tab"
