@@ -10,7 +10,7 @@ public class Main implements Serializable {
 
     @SerializedName("temp")
     @Expose
-    private String temp;
+    private double temp;
     @SerializedName("temp_min")
     @Expose
     private String tempMin;
@@ -33,11 +33,11 @@ public class Main implements Serializable {
     @Expose
     private String tempKf;
 
-    public String getTemp() {
+    public double getTemp() {
         return temp;
     }
 
-    public void setTemp(String temp) {
+    public void setTemp(double temp) {
         this.temp = temp;
     }
 

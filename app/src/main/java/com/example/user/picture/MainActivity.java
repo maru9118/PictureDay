@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         Retrofit mRetrofit = new Retrofit.Builder()
                 .baseUrl(WeatherApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -115,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
             case R.id.menu_delet:
                 mMarker.remove();
+                mWeatherData = null;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -122,10 +124,62 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMapLongClickListener(this);
 
-        LatLng startingPoint = new LatLng(37.56, 126.97);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 10));
+        if (mWeatherData == null) {
+            mMap.setOnMapLongClickListener(this);
+
+            LatLng startingPoint = new LatLng(37.56, 126.97);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 10));
+
+        } else {
+
+            double lat = mWeatherData.getCoord().getLat();
+            double lon = mWeatherData.getCoord().getLon();
+
+            LatLng latLng = new LatLng(lat, lon);
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
+            // 일출
+            SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
+            sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            // 일몰
+            SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
+            sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                    .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
+                            + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
+
+            mMarker.showInfoWindow();
+            mMarker.hideInfoWindow();
+
+            Call<Forecast> data = mApi.getForecast(WeatherApi.API_KEY, lat, lon);
+            data.enqueue(new Callback<Forecast>() {
+                @Override
+                public void onResponse(Call<Forecast> call, Response<Forecast> response) {
+                    final Forecast forecastData = response.body();
+
+                    GoogleMap.OnInfoWindowClickListener infoWindowClickListener = new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Intent intent = new Intent(MainActivity.this, NowActivity.class);
+                            intent.putExtra("data", mWeatherData);
+                            intent.putExtra("forecast", forecastData);
+
+                            startActivity(intent);
+                        }
+                    };
+                    mMap.setOnInfoWindowClickListener(infoWindowClickListener);
+                }
+
+                @Override
+                public void onFailure(Call<Forecast> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, "실패", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
 
@@ -254,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // 상태 저장
         outState.putDouble("Lat", mLat);
         outState.putDouble("Lng", mLng);
+        outState.putSerializable("data", mWeatherData);
 
         super.onSaveInstanceState(outState);
     }
@@ -264,23 +319,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mLat = savedInstanceState.getDouble("Lat");
         mLng = savedInstanceState.getDouble("Lng");
-
-        LatLng latLng = new LatLng(mLat, mLng);
-
-        // 일출
-        SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
-        sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        // 일몰
-        SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
-        sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng)
-                .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
-                        + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
-
-        marker.showInfoWindow();
-        marker.hideInfoWindow();
+        mWeatherData = (WeatherMain) savedInstanceState.getSerializable("data");
 
     }
 }

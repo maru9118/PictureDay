@@ -3,6 +3,7 @@ package com.example.user.picture;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.icu.text.DecimalFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,10 +125,33 @@ public class ExpAdater extends BaseExpandableListAdapter {
                 break;
         }
 
+        switch (GroupData.get(groupPosition).getWeather().get(childPosition).getMain()) {
+            case "Clear":
+                viewHolder.weatherText.setText("맑음");
+                break;
+            case "Clouds":
+                viewHolder.weatherText.setText("구름많음");
+                break;
+            case "Snow":
+                viewHolder.weatherText.setText("눈");
+                break;
+            case "Rain":
+                viewHolder.weatherText.setText("비");
+                break;
+            case "Haze":
+            case "Mist":
+                viewHolder.weatherText.setText("안개");
+                break;
+            default:
+                viewHolder.weatherText.setText("버그");
+                break;
+        }
 
-        viewHolder.weatherText.setText(GroupData.get(groupPosition).getWeather().get(childPosition).getMain());
+        Double tempChange = GroupData.get(groupPosition).getMain().getTemp() - 273.15;
+        DecimalFormat form = new DecimalFormat("#.##");
+        double dNumber = tempChange;
 
-        viewHolder.tempText.setText(GroupData.get(groupPosition).getMain().getTemp());
+        viewHolder.tempText.setText(form.format(dNumber));
 
         viewHolder.speedText.setText(GroupData.get(groupPosition).getWind().getSpeed());
 
