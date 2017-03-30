@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "596297622471",
+    "firebase_url": "https://wheather-e4069.firebaseio.com",
+    "project_id": "wheather-e4069",
+    "storage_bucket": "wheather-e4069.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596297622471:android:6841fb1a2f5734fc",
+        "android_client_info": {
+          "package_name": "com.whyweather.user.picture"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596297622471-q0cv9povlm68hbuqtcmghcno08igies0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.whyweather.user.picture",
+            "certificate_hash": "963e26587f64e1e261ab5542d8108d73010a2615"
+          }
+        },
+        {
+          "client_id": "596297622471-mj7nvp7f7g7m5fidmj2kkrla2kgs1ebl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBWwY0HhW6I4HxlWuTUOUjOCslk8ik8Hw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596297622471-mj7nvp7f7g7m5fidmj2kkrla2kgs1ebl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
