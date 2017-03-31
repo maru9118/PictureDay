@@ -2,8 +2,6 @@ package com.whyweather.user.picture;
 
 import android.content.Context;
 import android.content.Intent;
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.TimeZone;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -199,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
 
         // 일출
-        SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
-        sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
+        java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
+        sunRise.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         // 일몰
-        SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
-        sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
+        java.text.SimpleDateFormat sunSet = new java.text.SimpleDateFormat("kk:mm", Locale.KOREA);
+        sunSet.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
                 .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)

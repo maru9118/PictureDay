@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.icu.text.DecimalFormat;
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -95,12 +93,12 @@ public class NowFragment extends Fragment {
         }
 
         // 일출
-        SimpleDateFormat sunRise = new SimpleDateFormat("hh:mm", Locale.KOREA);
-        sunRise.setTimeZone(TimeZone.getTimeZone("UTC"));
+        java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
+        sunRise.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         // 일몰
-        SimpleDateFormat sunSet = new SimpleDateFormat("kk:mm", Locale.KOREA);
-        sunSet.setTimeZone(TimeZone.getTimeZone("UTC"));
+        java.text.SimpleDateFormat sunSet = new java.text.SimpleDateFormat("kk:mm", Locale.KOREA);
+        sunSet.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
         mRiseText.setText(sunRise.format(data.getSys().getSunrise() * 1000L));
         mSetText.setText(sunSet.format(data.getSys().getSunset() * 1000L));
