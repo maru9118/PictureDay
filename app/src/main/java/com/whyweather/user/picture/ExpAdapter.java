@@ -151,16 +151,16 @@ public class ExpAdapter extends BaseExpandableListAdapter {
         DecimalFormat form = new DecimalFormat("#.##");
         double dNumber = tempChange;
 
-        viewHolder.tempText.setText(form.format(dNumber));
+        viewHolder.tempText.setText(form.format(dNumber) + "˚C");
 
-        viewHolder.speedText.setText(GroupData.get(groupPosition).getWind().getSpeed());
+        viewHolder.speedText.setText(GroupData.get(groupPosition).getWind().getSpeed() + "m/s");
 
         viewHolder.wayImage.setImageBitmap(rotateImage(
                 BitmapFactory.decodeResource(parent.getContext().getResources(), R.drawable.wind),
                 GroupData.get(groupPosition).getWind().getDeg()));
 
         viewHolder.atmoText.setText(GroupData.get(groupPosition).getMain().getPressure());
-        viewHolder.humText.setText(GroupData.get(groupPosition).getMain().getHumidity());
+        viewHolder.humText.setText(GroupData.get(groupPosition).getMain().getHumidity() + "%");
 
         return convertView;
     }

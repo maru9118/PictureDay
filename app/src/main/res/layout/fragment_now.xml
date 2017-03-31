@@ -30,7 +30,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:gravity="center"
+            android:paddingBottom="5dp">
 
             <ImageView
                 android:layout_width="0dp"
@@ -77,25 +78,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp">
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="풍속" />
+                android:text="풍속"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="풍향" />
+                android:text="풍향"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -129,25 +131,26 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp">
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="날씨" />
+                android:text="날씨"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="기온" />
+                android:text="기온"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -183,34 +186,35 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp">
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="기압" />
+                android:text="기압"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="습도" />
+                android:text="습도"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:textStyle="bold"
-                android:textColor="#000"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="가시거리" />
+                android:text="가시거리"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

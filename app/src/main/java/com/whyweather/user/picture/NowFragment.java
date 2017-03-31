@@ -103,25 +103,47 @@ public class NowFragment extends Fragment {
         mRiseText.setText(sunRise.format(data.getSys().getSunrise() * 1000L));
         mSetText.setText(sunSet.format(data.getSys().getSunset() * 1000L));
 
-        mSpeedText.setText(data.getWind().getSpeed());
+        mSpeedText.setText(data.getWind().getSpeed() + "m/s");
 
 
         mWayImage = (ImageView) view.findViewById(R.id.way_image);
         mWayImage.setImageBitmap(rotateImage(
                 BitmapFactory.decodeResource(getResources(), R.drawable.wind), data.getWind().getDeg()));
 
-        mWeater.setText(data.getClouds().getAll());
+        mWeater.setText(data.getWeather().get(0).getMain());
+
+        switch (data.getWeather().get(0).getMain()) {
+            case "Clear":
+                mWeater.setText("맑음");
+                break;
+            case "Clouds":
+                mWeater.setText("구름많음");
+                break;
+            case "Snow":
+                mWeater.setText("눈");
+                break;
+            case "Rain":
+                mWeater.setText("비");
+                break;
+            case "Haze":
+            case "Mist":
+                mWeater.setText("안개");
+                break;
+            default:
+                mWeater.setText("버그");
+                break;
+        }
 
         Double tempChange = data.getMain().getTemp() - 273.15;
 
         DecimalFormat form = new DecimalFormat("#.##");
         double dNumber = tempChange;
 
-        mTempText.setText(form.format(dNumber));
+        mTempText.setText(form.format(dNumber) + "˚C");
 
         mAtmoText.setText(data.getMain().getPressure());
-        mHumText.setText(data.getMain().getHumidity());
-        mVisText.setText(data.getVisibility());
+        mHumText.setText(data.getMain().getHumidity() + "%");
+        mVisText.setText(data.getVisibility() + "m");
 
         return view;
     }
