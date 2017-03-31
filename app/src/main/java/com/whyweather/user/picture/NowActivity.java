@@ -17,9 +17,6 @@ import java.util.ArrayList;
 
 public class NowActivity extends FragmentActivity {
 
-    private TabLayout mTab;
-    private ViewPager mPager;
-    private MyAdater mAdater;
     private NowFragment mNowFragment;
     private ForecastFragment mForecastFragment;
 
@@ -28,28 +25,29 @@ public class NowActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now);
 
-        mTab = (TabLayout) findViewById(R.id.map_tab);
-        mPager = (ViewPager) findViewById(R.id.map_pager);
+        TabLayout mTab = (TabLayout) findViewById(R.id.map_tab);
+        ViewPager mPager = (ViewPager) findViewById(R.id.map_pager);
 
         WeatherMain data = (WeatherMain) getIntent().getSerializableExtra("data");
         Forecast forecast = (Forecast) getIntent().getSerializableExtra("forecast");
 
-        mAdater = new MyAdater(getSupportFragmentManager());
+        MyAdapter mAdapter = new MyAdapter(getSupportFragmentManager());
 
-        mPager.setAdapter(mAdater);
+        mPager.setAdapter(mAdapter);
         mTab.setupWithViewPager(mPager);
 
-        mNowFragment = new NowFragment().newInstance(data);
-        mForecastFragment = new ForecastFragment().newInstance((ArrayList<Title>) forecast.getTitle());
+        mNowFragment = NowFragment.newInstance(data);
+        mForecastFragment = ForecastFragment.newInstance((ArrayList<Title>) forecast.getTitle());
+
     }
 
     public void onClick(View view) {
         finish();
     }
 
-    public class MyAdater extends FragmentPagerAdapter {
+    public class MyAdapter extends FragmentPagerAdapter {
 
-        public MyAdater(FragmentManager fm) {
+        public MyAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -73,11 +71,9 @@ public class NowActivity extends FragmentActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    String a = "현재 날씨";
-                    return a;
+                    return "현재 날씨";
                 case 1:
-                    String b = "날씨 예보";
-                    return b;
+                    return "날씨 예보";
             }
             return null;
         }

@@ -44,8 +44,8 @@ public class ForecastFragment extends Fragment {
         mData = (ArrayList<Title>) bundle.getSerializable("data");
         mExpadableListView = (ExpandableListView) view.findViewById(R.id.expanded_menu);
 
-        ExpAdater adater = new ExpAdater(mData);
-        mExpadableListView.setAdapter(adater);
+        ExpAdapter adapter = new ExpAdapter(mData);
+        mExpadableListView.setAdapter(adapter);
 
         return view;
     }

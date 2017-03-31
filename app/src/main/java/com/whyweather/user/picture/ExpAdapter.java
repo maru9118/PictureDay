@@ -19,11 +19,11 @@ import java.util.List;
  * Created by user on 2017-03-23.
  */
 
-public class ExpAdater extends BaseExpandableListAdapter {
+public class ExpAdapter extends BaseExpandableListAdapter {
 
     private List<Title> GroupData;
 
-    public ExpAdater(List<Title> groupData) {
+    public ExpAdapter(List<Title> groupData) {
         GroupData = groupData;
     }
 
