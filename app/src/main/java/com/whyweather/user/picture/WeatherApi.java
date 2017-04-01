@@ -1,6 +1,6 @@
 package com.whyweather.user.picture;
 
-import com.whyweather.user.picture.Weather.WeatherMain;
+import com.whyweather.user.picture.weather.WeatherMain;
 import com.whyweather.user.picture.forecast.Forecast;
 
 import retrofit2.Call;

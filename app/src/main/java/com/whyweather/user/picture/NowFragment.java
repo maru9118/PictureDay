@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.whyweather.user.picture.Weather.WeatherMain;
+import com.whyweather.user.picture.weather.WeatherMain;
 
 import java.util.Locale;
 

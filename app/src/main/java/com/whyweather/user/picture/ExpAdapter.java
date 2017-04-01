@@ -186,7 +186,6 @@ public class ExpAdapter extends BaseExpandableListAdapter {
 
     // 이미지 회전 함수
     public Bitmap rotateImage(Bitmap src, float degree) {
-
         // Matrix 객체 생성
         Matrix matrix = new Matrix();
         // 회전 각도 셋팅

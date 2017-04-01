@@ -1,5 +1,6 @@
 package com.whyweather.user.picture;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -22,10 +23,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.whyweather.user.picture.Weather.WeatherMain;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.TedPermission;
 import com.whyweather.user.picture.forecast.Forecast;
+import com.whyweather.user.picture.weather.WeatherMain;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,7 +59,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         Retrofit mRetrofit = new Retrofit.Builder()
                 .baseUrl(WeatherApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -64,7 +67,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mApi = mRetrofit.create(WeatherApi.class);
         mGeocoder = new Geocoder(this);
 
+        PermissionListener permissionListener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Toast.makeText(MainActivity.this, "동의 됨", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+                Toast.makeText(MainActivity.this, "거절 됨", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        new TedPermission(this)
+                .setPermissionListener(permissionListener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION)
+                .check();
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -132,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mWeatherData == null) {
 
             LatLng startingPoint = new LatLng(37.56, 126.97);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 10));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 13));
 
         } else {
 
@@ -176,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onResponse(Call<WeatherMain> call, Response<WeatherMain> response) {
                 mWeatherData = response.body();
+                response.isSuccessful();
+                response.code();
 
                 if (mMarker != null) {
                     mMarker.remove();
@@ -194,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getForecast(double lat, double lon) {
         LatLng latLng = new LatLng(lat, lon);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
 
         // 일출
         java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
@@ -241,10 +265,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // 상태 저장
-        outState.putDouble("Lat", mLat);
-        outState.putDouble("Lng", mLng);
         outState.putSerializable("data", mWeatherData);
-
         super.onSaveInstanceState(outState);
     }
 
@@ -252,8 +273,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        mLat = savedInstanceState.getDouble("Lat");
-        mLng = savedInstanceState.getDouble("Lng");
         mWeatherData = (WeatherMain) savedInstanceState.getSerializable("data");
 
     }

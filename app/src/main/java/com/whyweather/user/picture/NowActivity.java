@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
-import com.whyweather.user.picture.Weather.WeatherMain;
+import com.whyweather.user.picture.weather.WeatherMain;
 import com.whyweather.user.picture.forecast.Forecast;
 import com.whyweather.user.picture.forecast.Title;
 

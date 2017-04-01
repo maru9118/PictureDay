@@ -1,5 +1,5 @@
 
-package com.whyweather.user.picture.Weather;
+package com.whyweather.user.picture.weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

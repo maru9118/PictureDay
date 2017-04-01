@@ -22,12 +22,9 @@ public class ForecastFragment extends Fragment {
     private ExpandableListView mExpadableListView;
 
     public static ForecastFragment newInstance(ArrayList<Title> data) {
-
         ForecastFragment fragment = new ForecastFragment();
-
         Bundle bundle = new Bundle();
         bundle.putSerializable("data", data);
-
         fragment.setArguments(bundle);
         return fragment;
     }
