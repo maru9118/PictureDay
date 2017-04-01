@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double mLat;
     private double mLng;
     private WeatherMain mWeatherData;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +72,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         PermissionListener permissionListener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
-                Toast.makeText(MainActivity.this, "동의 됨", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "동의 됨", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(MainActivity.this, "거절 됨", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "권한이 거절 되었습니다.", Toast.LENGTH_SHORT).show();
             }
         };
 
@@ -153,8 +155,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLongClickListener(this);
         if (mWeatherData == null) {
 
+            // 기존 위치 고정
             LatLng startingPoint = new LatLng(37.56, 126.97);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 13));
+
+// if (mGoogleApiClient == null) {
+//                mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                        .addConnectionCallbacks(this)
+//                        .addOnConnectionFailedListener(this)
+//            }
 
         } else {
 
@@ -218,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getForecast(double lat, double lon) {
         LatLng latLng = new LatLng(lat, lon);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
 
         // 일출
         java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);

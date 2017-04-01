@@ -4,13 +4,15 @@
 
     <item
         android:id="@+id/menu_serch"
-        app:actionViewClass="android.support.v7.widget.SearchView"
         android:icon="@android:drawable/ic_menu_search"
         android:title=""
+        app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always" />
+
     <item
         android:id="@+id/menu_delet"
         android:icon="@android:drawable/ic_menu_delete"
         android:title=""
         app:showAsAction="always" />
+    <menu />
 </menu>
