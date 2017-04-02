@@ -14,5 +14,4 @@
         android:icon="@android:drawable/ic_menu_delete"
         android:title=""
         app:showAsAction="always" />
-    <menu />
 </menu>

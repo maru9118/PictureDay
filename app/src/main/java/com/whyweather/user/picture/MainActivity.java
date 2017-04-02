@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double mLng;
     private WeatherMain mWeatherData;
     private GoogleApiClient mGoogleApiClient;
+    private float mZoomLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     final double lon = mList.get(0).getLongitude();
 
                     LatLng latLng = new LatLng(lat, lon);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel));
 
                     weatherData(lat, lon);
 
@@ -158,13 +159,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // 기존 위치 고정
             LatLng startingPoint = new LatLng(37.56, 126.97);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 13));
-
-// if (mGoogleApiClient == null) {
-//                mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                        .addConnectionCallbacks(this)
-//                        .addOnConnectionFailedListener(this)
-//            }
-
         } else {
 
             double lat = mWeatherData.getCoord().getLat();
@@ -227,7 +221,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void getForecast(double lat, double lon) {
         LatLng latLng = new LatLng(lat, lon);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mMap.getCameraPosition().zoom));
+        mZoomLevel = mMap.getCameraPosition().zoom;
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel));
 
         // 일출
         java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
