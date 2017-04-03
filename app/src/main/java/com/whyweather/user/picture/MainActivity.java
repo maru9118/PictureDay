@@ -3,9 +3,14 @@ package com.whyweather.user.picture;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -16,7 +21,9 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,13 +31,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 import com.whyweather.user.picture.forecast.Forecast;
 import com.whyweather.user.picture.weather.WeatherMain;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -40,7 +44,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
     private WeatherApi mApi;
@@ -48,10 +52,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Address> mList;
     private Marker mMarker;
     private double mLat;
-    private double mLng;
+    private double mLog;
     private WeatherMain mWeatherData;
-    private GoogleApiClient mGoogleApiClient;
     private float mZoomLevel;
+    private GoogleApiClient mGoogleApiClient;
+    private final int REQUEST_CODE_PERMISSONS = 1000;
+    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,24 +76,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mApi = mRetrofit.create(WeatherApi.class);
         mGeocoder = new Geocoder(this);
 
-        PermissionListener permissionListener = new PermissionListener() {
-            @Override
-            public void onPermissionGranted() {
-//                Toast.makeText(MainActivity.this, "동의 됨", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
-                Toast.makeText(MainActivity.this, "권한이 거절 되었습니다.", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        new TedPermission(this)
-                .setPermissionListener(permissionListener)
-                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION)
-                .check();
-
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
 
@@ -156,9 +151,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLongClickListener(this);
         if (mWeatherData == null) {
 
-            // 기존 위치 고정
-            LatLng startingPoint = new LatLng(37.56, 126.97);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 13));
         } else {
 
             double lat = mWeatherData.getCoord().getLat();
@@ -172,9 +164,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapLongClick(final LatLng latLng) {
         mLat = latLng.latitude;
-        mLng = latLng.longitude;
+        mLog = latLng.longitude;
 
-        weatherData(mLat, mLng);
+        weatherData(mLat, mLog);
     }
 
     public void citySearch(String city) {
@@ -278,6 +270,73 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onRestoreInstanceState(savedInstanceState);
 
         mWeatherData = (WeatherMain) savedInstanceState.getSerializable("data");
+
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE_PERMISSONS);
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+
+            mLat = mLastLocation.getLatitude();
+            mLog = mLastLocation.getLongitude();
+
+            LatLng startingPoint = new LatLng(mLat, mLog);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startingPoint, 13));
+
+            weatherData(mLat, mLog);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_CODE_PERMISSONS:
+                if (ActivityCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED &&
+                        ActivityCompat.checkSelfPermission(this,
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                                PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "권한 체크 거부 됨",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                return;
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 }
