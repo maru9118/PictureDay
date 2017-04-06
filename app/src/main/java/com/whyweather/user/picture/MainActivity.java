@@ -45,7 +45,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMyLocationButtonClickListener {
 
     private GoogleMap mMap;
     private WeatherApi mApi;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double mLat;
     private double mLog;
     private WeatherMain mWeatherData;
-    private float mZoomLevel;
+    private float mZoomLevel = 13f;
     private GoogleApiClient mGoogleApiClient;
     private final int REQUEST_CODE_PERMISSONS = 1000;
     private Location mLastLocation;
@@ -112,9 +112,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     final double lat = mList.get(0).getLatitude();
                     final double lon = mList.get(0).getLongitude();
 
-                    LatLng latLng = new LatLng(lat, lon);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel));
-
                     weatherData(lat, lon);
 
                     // 키보드 숨기기
@@ -152,9 +149,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
+            mMap.setOnMyLocationButtonClickListener(this);
         }
-
         mMap.setOnMapLongClickListener(this);
+
         if (mWeatherData == null) {
 
         } else {
@@ -344,5 +342,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        if (mMarker != null) {
+            mMarker.remove();
+        }
+
+        mLat = mLastLocation.getLatitude();
+        mLog = mLastLocation.getLongitude();
+
+        weatherData(mLat, mLog);
+
+        return false;
     }
 }
