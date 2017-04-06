@@ -2,24 +2,31 @@ package com.whyweather.user.picture;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +43,7 @@ import com.whyweather.user.picture.forecast.Forecast;
 import com.whyweather.user.picture.weather.WeatherMain;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,7 +66,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private float mZoomLevel = 13f;
     private GoogleApiClient mGoogleApiClient;
     private final int REQUEST_CODE_PERMISSONS = 1000;
+    private final int SEND_SMS_CODE = 1001;
     private Location mLastLocation;
+    private String mSunRise;
+    private String mSunSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +149,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.menu_delet:
                 mMarker.remove();
                 mWeatherData = null;
+                break;
+
+            case R.id.menu_share:
+                if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.SEND_SMS) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{
+                            Manifest.permission.SEND_SMS}, REQUEST_CODE_PERMISSONS);
+                }
+                phoneNumBerPick(mLat, mLog);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -220,17 +241,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mZoomLevel = mMap.getCameraPosition().zoom;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, mZoomLevel));
 
-        // 일출
-        java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
-        sunRise.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-
-        // 일몰
-        java.text.SimpleDateFormat sunSet = new java.text.SimpleDateFormat("kk:mm", Locale.KOREA);
-        sunSet.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+        mSunRise = mWeatherData.getSys().getSunrise();
+        mSunSet = mWeatherData.getSys().getSunset();
 
         mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
-                .title("" + sunRise.format(mWeatherData.getSys().getSunrise() * 1000L)
-                        + "→" + sunSet.format(mWeatherData.getSys().getSunset() * 1000L)));
+                .title(mSunRise + "→" + mSunSet));
 
         mMarker.showInfoWindow();
         mMarker.hideInfoWindow();
@@ -331,6 +346,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     finish();
                 }
                 return;
+
+            case SEND_SMS_CODE:
+                if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.SEND_SMS) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "권한 체크 거부 됨", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                return;
         }
     }
 
@@ -356,5 +380,60 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         weatherData(mLat, mLog);
 
         return false;
+    }
+
+    public String getAddress(double lat, double lng) {
+        String adderss = null;
+
+        mGeocoder = new Geocoder(this, Locale.KOREA);
+
+        List<Address> list = null;
+
+        try {
+            list = mGeocoder.getFromLocation(lat, lng, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (list == null) {
+            return null;
+        }
+
+        if (list.size() > 0) {
+            Address addr = list.get(0);
+            adderss = addr.getCountryName() + " "
+                    + addr.getAdminArea() + " "
+                    + addr.getLocality() + " "
+                    + addr.getSubLocality() + " "
+                    + addr.getThoroughfare() + " "
+                    + addr.getSubThoroughfare();
+        }
+        return adderss;
+    }
+
+    public void phoneNumBerPick(final double lat, final double log) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_number, null, false);
+        TextView numText = (TextView) view.findViewById(R.id.sms_text);
+        numText.setText(getAddress(lat, log) + " 의 정보를 공유하시겠습니까?");
+        final EditText numEditText = (EditText) view.findViewById(R.id.num_edit);
+        builder.setView(view);
+        builder.setPositiveButton("전송", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String phhoneNumber = numEditText.getText().toString();
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phhoneNumber));
+                intent.putExtra("sms_body", messageFormat());
+                startActivity(intent);
+            }
+
+            public String messageFormat() {
+                final String patten = "일출 : {0}, 일몰 : {1}\n지도에서 보기 : http://maps.google.com/maps?q={2},{3}";
+                return MessageFormat.format(patten, new Object[]{mSunRise, mSunSet, lat, log});
+            }
+
+        });
+        builder.setNegativeButton("취소", null);
+        builder.show();
     }
 }

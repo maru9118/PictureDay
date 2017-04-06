@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import com.whyweather.user.picture.weather.WeatherMain;
 
-import java.util.Locale;
-
 /**
  * Created by user on 2017-03-23.
  */
@@ -92,16 +90,9 @@ public class NowFragment extends Fragment {
                 break;
         }
 
-        // 일출
-        java.text.SimpleDateFormat sunRise = new java.text.SimpleDateFormat("hh:mm", Locale.KOREA);
-        sunRise.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
 
-        // 일몰
-        java.text.SimpleDateFormat sunSet = new java.text.SimpleDateFormat("kk:mm", Locale.KOREA);
-        sunSet.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-
-        mRiseText.setText(sunRise.format(data.getSys().getSunrise() * 1000L));
-        mSetText.setText(sunSet.format(data.getSys().getSunset() * 1000L));
+        mRiseText.setText(data.getSys().getSunrise());
+        mSetText.setText(data.getSys().getSunset());
 
         mSpeedText.setText(data.getWind().getSpeed() + "m/s");
 
