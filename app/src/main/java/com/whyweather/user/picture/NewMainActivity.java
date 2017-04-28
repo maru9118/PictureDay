@@ -3,12 +3,14 @@ package com.whyweather.user.picture;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -44,11 +46,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.whyweather.user.picture.forecast.Forecast;
 import com.whyweather.user.picture.weather.WeatherMain;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,12 +68,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NewMainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMyLocationButtonClickListener {
 
+    private static final String TAG = NewMainActivity.class.getSimpleName();
+
     private GoogleMap mMap;
 
     private WeatherApi mApi;
     private Geocoder mGeocoder;
 
     private List<Address> mList;
+    //    private List<History> mData = new ArrayList<>();
+    private List<History> mData;
 
     private Marker mMarker;
 
@@ -87,6 +98,8 @@ public class NewMainActivity extends AppCompatActivity
     private String mSunRise;
     private String mSunSet;
     private NavigationView mNavigationView;
+
+    private String mAdderss;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +137,27 @@ public class NewMainActivity extends AppCompatActivity
                     .build();
 
             myNumber();
+            initData();
+
+//            Log.d(TAG, "onCreate: 개발자님복원좀여");
+
+        }
+    }
+
+
+    private void initData() {
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String jsonData = pref.getString("addressData", "");
+
+        if (!jsonData.isEmpty()) {
+            Type type = new TypeToken<List<History>>() {
+            }.getType();
+
+            mData = new Gson().fromJson(jsonData, type);
+        } else {
+            mData = new ArrayList<>();
         }
     }
 
@@ -272,7 +306,7 @@ public class NewMainActivity extends AppCompatActivity
         });
     }
 
-    private void getForecast(double lat, double lon) {
+    private void getForecast(final double lat, final double lon) {
         LatLng latLng = new LatLng(lat, lon);
 
         mZoomLevel = mMap.getCameraPosition().zoom;
@@ -283,6 +317,16 @@ public class NewMainActivity extends AppCompatActivity
 
         mMarker = mMap.addMarker(new MarkerOptions().position(latLng)
                 .title(mSunRise + "→" + mSunSet));
+
+//        mData = new ArrayList<>();
+
+        if (mData.size() > 9) {
+            mData.remove(0);
+//            Log.d(TAG, "getForecast: " + mData.size());
+        }
+
+        mData.add(new History(getAddress(lat, lon)));
+        Log.d(TAG, "getForecast:" + mData.size());
 
         mMarker.showInfoWindow();
         mMarker.hideInfoWindow();
@@ -302,6 +346,7 @@ public class NewMainActivity extends AppCompatActivity
                         intent.putExtra("forecast", forecastData);
 
                         startActivity(intent);
+
                     }
                 };
                 mMap.setOnInfoWindowClickListener(infoWindowClickListener);
@@ -429,7 +474,7 @@ public class NewMainActivity extends AppCompatActivity
     }
 
     public String getAddress(double lat, double lng) {
-        String adderss = null;
+        mAdderss = null;
 
         mGeocoder = new Geocoder(this, Locale.KOREA);
 
@@ -447,14 +492,15 @@ public class NewMainActivity extends AppCompatActivity
 
         if (list.size() > 0) {
             Address addr = list.get(0);
-            adderss = addr.getCountryName() + " "
+            mAdderss = addr.getCountryName() + " "
                     + addr.getAdminArea() + " "
                     + addr.getLocality() + " "
                     + addr.getSubLocality() + " "
                     + addr.getThoroughfare() + " "
                     + addr.getSubThoroughfare();
         }
-        return adderss;
+
+        return mAdderss;
     }
 
     public void phoneNumBerPick(final double lat, final double log) {
@@ -501,13 +547,41 @@ public class NewMainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.domicile_item) {
+            Intent intent = new Intent(this, HistoryActivity.class);
+            intent.putExtra("address", (Serializable) mData);
+            startActivity(intent);
+            Log.d(TAG, "onNavigationItemSelected:" + mData.size());
 
-            Toast.makeText(this, "예엘에레엘에레에ㅔㄹ엘", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "예엘에레엘에레에ㅔㄹ엘", Toast.LENGTH_SHORT).show();
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void savePrefence() {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putString("addressData", new Gson().toJson(mData));
+        editor.apply();
+    }
+
+//    @Override
+//    protected void onDestroy() {
+//        savePrefence();
+//        super.onDestroy();
+//
+//        Log.d(TAG, "onDestroy: 으레레레레레ㅔㄹ");
+//    }
+//
+    @Override
+    protected void onPause() {
+        savePrefence();
+        super.onPause();
+
+//        Log.d(TAG, "onPause: 되라되로다롿롿뢸되라얍!!!!!");
     }
 }
