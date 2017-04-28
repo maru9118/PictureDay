@@ -45,11 +45,11 @@ public class NowActivity extends FragmentActivity {
         finish();
     }
 
-    public class MyAdapter extends FragmentPagerAdapter {
+    private class MyAdapter extends FragmentPagerAdapter {
 
-        public MyAdapter(FragmentManager fm) {
+        MyAdapter(FragmentManager fm) {
             super(fm);
-        }
+    }
 
         @Override
         public Fragment getItem(int position) {

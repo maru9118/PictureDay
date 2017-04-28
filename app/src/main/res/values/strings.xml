@@ -2,4 +2,11 @@
     <string name="app_name">날씨어때?</string>
     <string name="title_activity_main">날씨어때?</string>
     <string name="title_activity_test">testActivity</string>
+    <string name="title_activity_main22">Main22Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_new_main">NewMainActivity</string>
 </resources>
